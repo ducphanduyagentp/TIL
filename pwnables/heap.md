@@ -1,31 +1,4 @@
-# 07122018
-
-## pwnable.tw hacknote
-
-- There is a global array with 5 elements. Each contains a pointer to a struct Note
-- Struct Note
-    ```
-    typedef struct Note {
-        void (*func)(char *str);
-        char *content;
-    } Note;
-    ```
-- Exploitation plan
-    - Since the addNote function is buggy, even if the note is deleted, you can only alloc 5 times in total
-    - Alloc 2 note, then trigger double free to prepare the fastbin attack
-    - Alloc 1 note. This will be the chunk that we're creating fake chunk
-    - Create a fake chunk with the first pointer point to system, the second one point to "/bin/sh"
-- That exploitation plan will not work because it takes at least 6 mallocs to take control of the desired pointer. I've come up with a different one.
-    - Alloc chunk A: 1024
-    - Alloc chunk B: 100
-    - Free chunk B
-    - Free chunk A
-    - Now we are able to leak main_arena in chunk A's data
-    - Alloc chunk C, same size as chunk A / 1024. Write 4 bytes
-    - Print chunk C => main_arena get printed.
-    - Free chunk C
-    - Alloc chunk D / 1080, but with larger size so that it stays in the same bin as chunk B. Overflow to the data into chunk B's data to overwrite the address of the putsWrapper function to system and the pointer of the string to "/bin/sh". Or we can keep /bin/sh. But this requires leaking heap address.
-    - Print chunk B (Use-After-Free) => system("/bin/sh") is called. pwned.
+# Heap exploitation
 
 ## Fastbin attack
 
@@ -58,3 +31,10 @@
 ```
 
 - Typical scenario: There's a global pointer or some pointer that we've known it's address
+
+## House of Force
+
+- Prerequisite: 3 mallocs
+    - 1st malloc: Know the address of the top chunk
+    - 2nd malloc: arbitrary size
+    - 3rd malloc: To overwrite data

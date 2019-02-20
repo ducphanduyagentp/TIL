@@ -1,4 +1,4 @@
-# 06162018
+# Day 1
 
 - Recon for subdomains
     - Scan all ports for services

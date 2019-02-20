@@ -1,6 +1,6 @@
-# 08312018
+# Flare-on
 
-## FLARE-ON 5 challenge #5
+## FLARE-ON 5 challenge #5 - 08312018
 
 ### What the wasm binary is trying to do
 
@@ -67,3 +67,25 @@ Type "help", "copyright", "credits" or "license" for more information.
 ^C
 C:\Users\ptneg>
 ```
+
+## Magic - FlareOn5 - 09062918
+
+- The program does dynamic code execution. There is a RWX data segment that will be decrypted to code to be called later in the program.
+- In the unpack function, there is a check of the input length against a series of value.
+- If the above check is passed, XOR decryption happens.
+- The dynamic function call then happens. If the returned value doesn't pass the check, it encrypts the code again and return false.
+- Exfiltrate function data:
+    - Use manticore to extract addresses and other params to function calls.
+    - Didn't work because I probably don't know how to use these symbollic execution engines
+    - Manually parsed the data, because IDA decomplication got something wrong
+- There are several types of check functions:
+    - Calculate the n_th fibonacci number with n = ord(c)
+    - Do simple arithmetic checking (equals, +13, ^0x2a)
+    - AND operation
+    - Short constants
+    - Long constants
+- Each password has 69 characters and they are checked by parts.
+- And here comes r2pipe for dynamic analysis.
+    - set breakpoints when the comparisons happen and get the correct value of the character, then work out the input string
+    - also dumping the decrypted code can be done easily :)
+- There are only 6 function calls to complicated maths. Others are trivial.
