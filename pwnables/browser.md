@@ -14,3 +14,4 @@
     - Through a variable address (haven't checked universally)
         - After getting an address of a variable, there is a pointer in the first few values of the page that eventually dereferences to an address in libv8.so. This is some C++ function
         - After getting this address, do the same as the method above to get `__cxa_finalize`
+    - When searching for GOT offset in libv8.so, need to grep for `GLIBC_2.2.5 + 0` or something similar, using the `-a` flag.
